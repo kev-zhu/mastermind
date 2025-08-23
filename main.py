@@ -25,18 +25,12 @@ class Game:
     self.code_breaker = None
   
   def start():
-    """
-    This will start the game itself
-
-    Initialize CodeMaker and CodeBreaker to begin game
-    Run game into a loop for the range in number of attempts
-    Run functions, validations, and updates for each turn
-    """
+    """Initialize players to begin game and loop through turns."""
     pass
 
   def make_move():
     """
-    Singular game move
+    Singular game move that run logic/functions, validations, and updates variables for each turn.
 
     This will encompass the following:
     - Ask CodeBreaker to make a vaid guess
@@ -47,56 +41,57 @@ class Game:
     """
     pass
 
-  def is_over() -> str:
+  def is_over() -> bool:
     """
-    Analyze feedback's properties to see if game is over
-    
-    Ends round if winner determined, otherwise continue with game
+    Analyze feedback's properties and ends round if winner is determined.
 
-    Returns a string of who the winner is this round
+    Returns:
+      bool: True if either player wins, False otherwise.
     """
     pass
 
   def get_history() -> str:
     """
-    Print out formatted history of current game
+    Print out formatted history of current game.
 
-    Returns a formatted string/log of history: (Turn) - (Code), (Feedback)
+    Returns:
+      string: Formatted string/log of history: (Turn) - (Code), (Feedback).
     """
     pass
 
 
 class CodeBreaker:
-  """For creating an instance of CodeBreaker player and handles ONLY its logic"""
+  """For creating an instance of CodeBreaker player and handles ONLY its logic."""
   def __init__(self, code_length, code_range):
     self.code_length = code_length
     self.code_range = code_range
 
   def make_guess(self) -> "Code":
     """
-    Asks user to input a guess
+    Request user input until valid guess is given.
+
     Validate user's guess with Code requirements/rules
     If invalid, reiterate this request until Code is valid
+
+    Returns:
+      Code: Object to hold information about valid user input.
     """
     pass
 
   def validate_guess(self) -> bool:
     """
-    Ensures that the guess that the CodeBreaker inputs is of valid length and value
+    Ensures the guess input is valid in both length and value.
     
     Calls on Code.validate() to verify
 
-    Returns true if code is valid, otherwise, game will ask player to make another guess following rules
+    Returns:
+      bool: True if code sequence is valid, else False.
     """
     pass
 
 
 class CodeMaker:
-  """
-  For creating instance of CodeMaker and handles ONLY its logic
-  - Stores secret code
-  - Calls on code comparison
-  """
+  """For creating instance of CodeMaker player and handles ONLY its logic."""
   def __init__(self, code_length, code_range):
     self.code_length = code_length
     self.code_range = code_range
@@ -104,57 +99,78 @@ class CodeMaker:
 
   def make_code(self) -> "Code":
     """
-    Generate secret code
+    Generate secret code.
     
     Use API call (or user entry option later)
     - Ensure that API call has try/except block to handle failure with API call promise
     - Ensure this method is asynchronous to account for time of API call
     - Parse, format the Code, and make sure it is also valid
     - Store generated code as Code obj under secret_code
+
+    Returns:
+      Code: Valid Code obj with sequence generated from random API.
     """
     pass
 
   def evaluateCode(self, guess_code) -> "Feedback":
     """
-    Calls on Code.compare() to make a comparison between guess_code and secret_code
-    Returns Feedback object
+    Calls on a comparison between CodeMaker's secrete code and CodeBreaker's guess code.
+    
+    Returns:
+      Feedback: Formatted object of the user's guess comparison result.
     """
     pass
 
 
 class Code():
-  """Handles ONLY Code logic"""
+  """Handles ONLY Code logic."""
   def __init__(self, sequence, length_rule, range_rule):
     self.sequence = sequence
-    pass
+    self.length_rule = length_rule
+    self.range_rule = range_rule
   
-  def compare_with(self) -> "Feedback":
+  def compare_with(self, other_code) -> "Feedback":
     """
-    Comparison logic between two codes, regardless of where it comes from
-    Returns Feedback object after comparison
+    Comparison logic between two Code objects, regardless of where it comes from.
+
+    Args:
+      other_code(Code): the other Code object being compared to.
+   
+    Returns:
+      Feedback: Organized format for based off of the comparsion logic.
     """
     pass
 
   def validate(self) -> bool:
-    """Validates if Code follows rule, if not return False"""
+    """
+    Checks if Code sequence follows rule.
+    
+    Returns:
+      bool: True if sequence is valid, otherwise False.
+    """
     pass
 
   def to_string(self) -> str:
-    """Return Code object into a readable user friendly format"""
+    """Return Code object into a readable user friendly format."""
     pass
 
 
 class Feedback():
-  """For formatting result of Code comparison and quality of guess"""
-  def __init__(self, correct_number, correct_location):
+  """For formatting result of Code comparison and quality of guess."""
+  def __init__(self, correct_number, correct_location, code_length):
     self.correct_number = correct_number
     self.correct_location = correct_location
+    self.code_length = code_length
 
   def is_perfect(self) -> bool:
-    """Return True if guess is a perfect replica of the secret and trigger the game's end"""
+    """
+    Response to a guess being a perfect match.
+    
+    Returns:
+      bool: True if guess all correct numbers and locations at max code length."""
     pass
 
   def to_string(self) -> str:
-    """Return Feedback object into a readable user friendly format"""
+    """Returns a readable formatted string of this result."""
     pass
   
