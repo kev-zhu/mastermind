@@ -24,7 +24,7 @@ class Game:
     self.code_maker = CodeMaker(self.code_length, self.code_range)
     self.code_maker.generate_code()
     ### delete later -- for testing purposes only
-    print(f'secret code generated it is {self.code_maker.secret_code.to_string()}')
+    # print(f'secret code generated it is {self.code_maker.secret_code.to_string()}')
 
     self.code_breaker = CodeBreaker(self.code_length, self.code_range)
     self.active_game = True
@@ -34,7 +34,7 @@ class Game:
       self.make_move()
 
     self.active_game = False
-    print(f"{self.winner} won this round!")  
+    print(f"The secrete code was {self.code_maker.secret_code}. {self.winner} won this round!")  
 
   def make_move(self):
     """
@@ -59,7 +59,8 @@ class Game:
       guess_code = self.code_breaker.make_guess()
 
     self.current_guess = guess_code
-    fb = self.code_maker.secret_code.compare_with(guess_code)
+    fb = self.code_maker.evaluate_code(guess_code)
+    # fb = self.code_maker.secret_code.compare_with(guess_code)
     self.current_feedback = fb
     print(fb.to_string())
     self.update_game_state()
@@ -154,14 +155,14 @@ class CodeMaker:
       s += (str)(random.randint(0, self.code_range - 1))
     return s
 
-  def evaluateCode(self, guess_code) -> "Feedback":
+  def evaluate_code(self, guess_code) -> "Feedback":
     """
     Calls on a comparison between CodeMaker's secrete code and CodeBreaker's guess code.
     
     Returns:
       Feedback: Formatted object of the user's guess comparison result.
     """
-    return self.secret_code.compare_with(guess_code.secret_code)
+    return self.secret_code.compare_with(guess_code)
 
 
 class Code():
