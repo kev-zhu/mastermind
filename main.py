@@ -1,4 +1,4 @@
-from mastermind.game import Game
+from mastermind import Game
 
 def main() -> None:
   """Entry point for starting a new Mastermind game."""
