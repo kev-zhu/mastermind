@@ -10,19 +10,18 @@ class Game:
     self.max_attempt = max_attempt
     self.code_maker = None
     self.code_breaker = None
-    self.turn = None
+    self.turn = 0
     self.history = [] # List[Tuple(CodeEntry, Feedback)]
     self.active_game = False
-
     self.current_guess = None
     self.current_feedback = None
     self.winner = None
   
   def start(self) -> None:
     """Initialize players, set up game, and prepare to run game loop."""
-    self.code_breaker = CodeBreaker(self.code_length, self.code_range)
     self.code_maker = CodeMaker(self.code_length, self.code_range)
     self.code_maker.generate_code()
+    self.code_breaker = CodeBreaker(self.code_length, self.code_range)
     ### delete later -- for testing purposes only
     print(f'secret code generated it is {self.code_maker.secret_code.to_string()}')
     self.active_game = True
@@ -58,6 +57,10 @@ class Game:
         print(f"Enter {self.code_length} numbers ranging from 0-{self.code_range - 1}.")
       guess_code = self.code_breaker.make_guess()
     return guess_code
+  
+  # def analyze_code_breaker_input(self, user_input) -> str:
+  #   """Analyze the input and print a statement/handle game logic before returning it back?"""
+  #   pass
 
   def request_code_maker_evalulation(self, guess_code) -> "Feedback":
     """Request Code Maker to make evaluation of CodeEntry comparison quality."""

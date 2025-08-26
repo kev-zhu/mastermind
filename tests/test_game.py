@@ -7,6 +7,19 @@ from mastermind import CodeEntry
 from mastermind import Feedback
 
 #UNIT TESTS
+def test_game_start():
+  """Should have updated version of game state after start() runs"""
+  game = Game()
+  assert game.code_maker == None
+  assert game.code_breaker == None
+  assert game.turn == 0
+  assert game.active_game == False
+  game.start()
+  assert isinstance(game.code_maker, CodeMaker)
+  assert isinstance(game.code_breaker, CodeBreaker)
+  assert game.turn == 1
+  assert game.active_game
+
 def test_code_breaker_guess_request(monkeypatch):
   """Automate input with monkeypatch to test for valid Code Breaker guess entry."""
   monkeypatch.setattr("builtins.input", lambda _:"1234")
@@ -34,7 +47,7 @@ def test_request_code_maker_perfect_evaluation(sample_code_sequence, perfect, sa
 def test_update_game_state_history_and_turns(dummy_code = "1234", dummy_length=4, dummy_range=8):
   """Should update states of game to prepare for next game move."""
   game = Game()
-  game.code_breaker = CodeBreaker(dummy_length, dummy_range)
+  game.start()
   game.current_guess = CodeEntry(dummy_code, dummy_length, dummy_range)
   game.current_feedback = Feedback(dummy_length, dummy_length, dummy_length)
   game.update_game_state()
