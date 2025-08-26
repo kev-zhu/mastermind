@@ -7,11 +7,11 @@ class Game:
   def __init__(self, code_length: int=4, code_range: int=8, max_attempt: int=10):
     self.code_length = code_length
     self.code_range = code_range
-    self.turn = 1
     self.max_attempt = max_attempt
-    self.history = [] # List[Tuple(CodeEntry, Feedback)]
     self.code_maker = None
     self.code_breaker = None
+    self.turn = None
+    self.history = [] # List[Tuple(CodeEntry, Feedback)]
     self.active_game = False
 
     self.current_guess = None
@@ -20,16 +20,22 @@ class Game:
   
   def start(self) -> None:
     """Initialize players, set up game, and prepare to run game loop."""
+    self.code_breaker = CodeBreaker(self.code_length, self.code_range)
     self.code_maker = CodeMaker(self.code_length, self.code_range)
     self.code_maker.generate_code()
     ### delete later -- for testing purposes only
     print(f'secret code generated it is {self.code_maker.secret_code.to_string()}')
-
-    self.code_breaker = CodeBreaker(self.code_length, self.code_range)
     self.active_game = True
+    self.turn = 1
+    self.history.clear()
+    self.current_guess = None
+    self.current_feedback = None
+    self.winner = None
+
+  def run(self) -> None:
+    """Runs the game loop after."""
     while self.active_game and not self.is_over():
       self.make_move()
-
     self.active_game = False
     print(f"The secret code was {self.code_maker.secret_code.sequence}. Congratulations, {self.winner} won this round!")  
 
