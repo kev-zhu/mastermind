@@ -27,10 +27,10 @@ class CodeMaker:
         if attempt < max_retries - 1:
           time.sleep(delay)
         else:
-          self.secret_code = CodeEntry(self.in_house_random_seq_gen(), self.code_length, self.code_range)
+          self.secret_code = CodeEntry(self.use_in_house_random_seq_gen(), self.code_length, self.code_range)
           print("Max retries exceeded. Generate random code again later, or try playing with in-house generated secret code :).")
 
-  def in_house_random_seq_gen(self) -> str:
+  def use_in_house_random_seq_gen(self) -> str:
     """Generates random code sequence as fallback, returns random sequence."""
     s = ""
     for _ in range(self.code_length):

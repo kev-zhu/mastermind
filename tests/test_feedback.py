@@ -9,6 +9,7 @@ from mastermind import Feedback
   (0, 0, 4, False)    #False - imperfect case
 ])
 def test_feedback_is_perfect(correct_num, correct_loc, code_length, perfect):
+  """Feedback should be perfect when correct_num = correct_loc = code_length."""
   feedback = Feedback(correct_num, correct_loc, code_length)
   assert feedback.is_perfect() == perfect
 
@@ -20,5 +21,6 @@ def test_feedback_is_perfect(correct_num, correct_loc, code_length, perfect):
   (0, 0, 4, "0 correct numbers and 0 correct locations")    #0nums/0locs
 ])
 def test_feedback_to_string(correct_num, correct_loc, code_length, feedback_string):
+  """Feedback should be a formatted string."""
   feedback = Feedback(correct_num, correct_loc, code_length)
   assert feedback.to_string() == feedback_string
