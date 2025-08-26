@@ -1,6 +1,7 @@
 from .code_maker import CodeMaker
 from .code_breaker import CodeBreaker
 
+
 class Game:
   """Create instance instance of the game, handles game logic."""
   def __init__(self, code_length: int=4, code_range: int=8, max_attempt: int=10):
@@ -18,7 +19,7 @@ class Game:
     self.winner = None
   
   def start(self) -> None:
-    """Initialize players and run game loop."""
+    """Initialize players, set up game, and prepare to run game loop."""
     self.code_maker = CodeMaker(self.code_length, self.code_range)
     self.code_maker.generate_code()
     ### delete later -- for testing purposes only
@@ -26,15 +27,22 @@ class Game:
 
     self.code_breaker = CodeBreaker(self.code_length, self.code_range)
     self.active_game = True
-
     while self.active_game and not self.is_over():
       self.make_move()
 
     self.active_game = False
-    print(f"The secret code was {self.code_maker.secret_code.sequence}. {self.winner} won this round!")  
+    print(f"The secret code was {self.code_maker.secret_code.sequence}. Congratulations, {self.winner} won this round!")  
 
   def make_move(self) -> None:
     """Perform a single game move: CodeBreaker guess, code validate, CodeMaker evaluate, update states based on Feedback."""
+    guess_code = self.request_code_breaker_guess()
+    self.current_guess = guess_code
+    guess_feedback = self.request_code_maker_evalulation(guess_code)
+    self.current_feedback = guess_feedback
+    self.update_game_state()
+  
+  def request_code_breaker_guess(self) -> "CodeEntry":
+    """Request Code Breaker to input a valid guess, returns a valid CodeEntry object that follows game restraints."""
     guess_code = self.code_breaker.make_guess()
     while not guess_code.is_valid():
       #case switch here for inputs that arent code history, rules, quit, hint?
@@ -43,13 +51,14 @@ class Game:
       else:
         print(f"Enter {self.code_length} numbers ranging from 0-{self.code_range - 1}.")
       guess_code = self.code_breaker.make_guess()
+    return guess_code
 
-    self.current_guess = guess_code
-    fb = self.code_maker.evaluate_code(guess_code)
-    self.current_feedback = fb
-    print(fb.to_string())
-    self.update_game_state()
-  
+  def request_code_maker_evalulation(self, guess_code) -> "Feedback":
+    """Request Code Maker to make evaluation of CodeEntry comparison quality."""
+    requested_feedback = self.code_maker.evaluate_code(guess_code)
+    print(requested_feedback.to_string())
+    return requested_feedback
+
   def update_game_state(self) -> None:
     """Update history and turn counter."""
     self.history.append((self.current_guess, self.current_feedback))

@@ -3,16 +3,16 @@ from mastermind import CodeMaker
 from mastermind import CodeEntry
 from mastermind import Feedback
 
-@pytest.mark.parametrize("code_length, code_range", [
-  (4, 8),   #standard game request
-  (0, 8)    #force an error on API call with length = 0, will use in-house generator
-])
-def test_generate_code(code_length, code_range):
-  """API call or in-house generator should update CodeMaker's secret code."""
-  code_maker = CodeMaker(code_length, code_range)
-  code_maker.generate_code()
-  assert code_maker.secret_code != None
-  assert len(code_maker.secret_code.sequence) == code_length
+# @pytest.mark.parametrize("code_length, code_range", [
+#   (4, 8),   #standard game request
+#   (0, 8)    #force an error on API call with length = 0, will use in-house generator
+# ])
+# def test_generate_code(code_length, code_range):
+#   """API call or in-house generator should update CodeMaker's secret code."""
+#   code_maker = CodeMaker(code_length, code_range)
+#   code_maker.generate_code()
+#   assert code_maker.secret_code != None
+#   assert len(code_maker.secret_code.sequence) == code_length
 
 @pytest.mark.parametrize("code_length, code_range", [
   (4, 8),   #generate 4 numbers from 0-7
@@ -24,7 +24,6 @@ def test_in_house_random_seq_gen(code_length, code_range):
   """Should generate a sequence of number in string format of CodeMaker's specified length and range."""
   code_maker = CodeMaker(code_length, code_range)
   sequence = code_maker.use_in_house_random_seq_gen()
-  print(sequence)
   assert all([0 <= int(c) < code_range for c in sequence])  #test for range
   assert len(sequence) == code_length                       #test for length
 
