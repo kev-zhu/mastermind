@@ -1,7 +1,6 @@
 from .code_maker import CodeMaker
 from .code_breaker import CodeBreaker
 
-
 class Game:
   """Create instance instance of the game, handles game logic."""
   def __init__(self, code_length: int=4, code_range: int=8, max_attempt: int=10):
@@ -39,7 +38,7 @@ class Game:
     print(f"The secret code was {self.code_maker.secret_code.sequence}. Congratulations, {self.winner} won this round!")  
 
   def make_move(self) -> None:
-    """Perform a single game move: CodeBreaker guess, code validate, CodeMaker evaluate, update states based on Feedback."""
+    """Perform a single game move: CodeBreaker guess, CodeMaker evaluate, update game's current_guess and current_feedback."""
     guess_code = self.request_code_breaker_guess()
     self.current_guess = guess_code
     guess_feedback = self.request_code_maker_evalulation(guess_code)

@@ -1,5 +1,5 @@
 import pytest
-
+from unittest.mock import MagicMock
 from mastermind import Game
 from mastermind import CodeBreaker
 from mastermind import CodeMaker
@@ -31,6 +31,7 @@ def test_code_breaker_guess_request(monkeypatch):
 
 @pytest.mark.parametrize("sample_code_sequence, perfect, sample_feedback_string", [
   ("1234", True, "4 correct numbers and 4 correct locations"),
+  ("1243", False, "4 correct numbers and 2 correct locations"),
   ("0567", False, "0 correct numbers and 0 correct locations")
 ])
 def test_request_code_maker_perfect_evaluation(sample_code_sequence, perfect, sample_feedback_string):
@@ -60,6 +61,7 @@ def test_game_is_over_max_attempts_reached():
   game = Game(max_attempt=1)
   game.turn = 2
   assert game.is_over()
+  assert not game.active_game
   assert game.winner == "Code Maker"
 
 def test_game_is_over_perfect_guess_feedback():
@@ -68,6 +70,7 @@ def test_game_is_over_perfect_guess_feedback():
   perfect_feedback = Feedback(4, 4, 4)
   game.current_feedback = perfect_feedback
   assert game.is_over()
+  assert not game.active_game
   assert game.winner == "Code Breaker"
 
 def test_get_correct_history_format():
@@ -88,5 +91,43 @@ def test_get_correct_history_format():
   assert f"Guess #1: 1234 -" in history_str
   assert f"Guess #2: 2345 - {game.current_feedback.to_string()}" in history_str
 
-#COMPONENT TESTS w/ monkeypatch
+#COMPONENT TESTS w/ monkeypatch and MagicMock
+def test_game_end_to_end_breaker_wins(monkeypatch):
+  """Simulates middle of game where Code Maker returns a perfect Feedback response and ends game after."""
+  game = Game(max_attempt=3)
+  game.start()
 
+  #simulate a move in the middle of a game where the code breaker's guess has a perfect feedback response
+  game.code_maker = MagicMock()
+  monkeypatch.setattr("builtins.input", lambda _:"1234")
+  mock_feedback = MagicMock()
+  mock_feedback.is_perfect.return_value = True
+  game.current_feedback = mock_feedback
+  game.code_maker.evaluate_code.return_value = mock_feedback
+  game.make_move()
+  #game.run() called here to do a check for the next game move following game move
+  game.run()
+  assert game.winner == "Code Breaker"
+  assert not game.active_game
+
+def test_game_end_to_end_maker_wins():
+  """Simulate last guess attempt of game where Code Breaker makes an incorrect guess."""
+  game = Game(max_attempt=3)
+  game.start()
+  game.turn = game.max_attempt    #move onto last move
+
+  #simulate last attempt move where guess is not perfect
+  game.code_breaker = MagicMock()
+  game.code_maker = MagicMock()
+  mock_guess = MagicMock()
+  mock_guess.is_valid.return_value = True
+  game.code_breaker.make_guess_return_value = mock_guess
+  mock_feedback = MagicMock()
+  mock_feedback.is_perfect.return_value = False
+  game.code_maker.evalulate_code.return_value = mock_feedback
+  game.make_move()
+  #game.run() called here to do a check for the next game move following game move
+  game.run()
+  assert game.winner == "Code Maker"
+  assert not game.active_game
+  assert game.turn == game.max_attempt + 1
