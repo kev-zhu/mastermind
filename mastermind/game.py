@@ -4,6 +4,12 @@ from .code_breaker import CodeBreaker
 class Game:
   """Create instance instance of the game, handles game logic."""
   def __init__(self, code_length: int=4, code_range: int=8, max_attempt: int=10):
+    if (not str(code_length).isdigit() or code_length < 1):
+      raise ValueError("code_length must be a positive integer.")
+    elif (not str(code_range).isdigit() or code_range < 1):
+      raise ValueError("code_range must be a positive integer.")
+    elif (not str(max_attempt).isdigit() or max_attempt < 1):
+      raise ValueError("max_attempt must be a positive integer.")
     self.code_length = code_length
     self.code_range = code_range
     self.max_attempt = max_attempt

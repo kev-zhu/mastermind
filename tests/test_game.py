@@ -7,6 +7,19 @@ from mastermind import CodeEntry
 from mastermind import Feedback
 
 #UNIT TESTS
+@pytest.mark.parametrize("code_length, code_range, max_attempt, message", [
+  (0, 8, 10, "code_length must be a positive integer."),
+  (4, 0, 10, "code_range must be a positive integer."),
+  (4, 8, 0, "max_attempt must be a positive integer."),
+  (-1, 8, 10, "code_length must be a positive integer."),
+  (4, -1, 10, "code_range must be a positive integer."),
+  (4, 8, -1, "max_attempt must be a positive integer.")
+])
+def test_game_boundaries(code_length, code_range, max_attempt, message):
+  """Negative boundaries for game constructor initilization should trigger error or end."""
+  with pytest.raises(ValueError, match=message):
+    game = Game(code_length, code_range, max_attempt)
+
 def test_game_start():
   """Should have updated version of game state after start() runs"""
   game = Game()
@@ -91,12 +104,11 @@ def test_get_correct_history_format():
   assert f"Guess #1: 1234 -" in history_str
   assert f"Guess #2: 2345 - {game.current_feedback.to_string()}" in history_str
 
-#COMPONENT TESTS w/ monkeypatch and MagicMock
+#COMPONENT TESTS w/ monkeypatch and MagicMock for game simulation
 def test_game_end_to_end_breaker_wins(monkeypatch):
   """Simulates middle of game where Code Maker returns a perfect Feedback response and ends game after."""
-  game = Game(max_attempt=3)
+  game = Game()
   game.start()
-
   #simulate a move in the middle of a game where the code breaker's guess has a perfect feedback response
   game.code_maker = MagicMock()
   monkeypatch.setattr("builtins.input", lambda _:"1234")
@@ -112,10 +124,9 @@ def test_game_end_to_end_breaker_wins(monkeypatch):
 
 def test_game_end_to_end_maker_wins():
   """Simulate last guess attempt of game where Code Breaker makes an incorrect guess."""
-  game = Game(max_attempt=3)
+  game = Game()
   game.start()
   game.turn = game.max_attempt    #move onto last move
-
   #simulate last attempt move where guess is not perfect
   game.code_breaker = MagicMock()
   game.code_maker = MagicMock()
