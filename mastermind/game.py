@@ -25,8 +25,10 @@ class Game:
   def start(self) -> None:
     """Initialize players, set up game, and prepare to run game loop."""
     self.code_maker = CodeMaker(self.code_length, self.code_range)
-    self.code_maker.generate_code()
     self.code_breaker = CodeBreaker(self.code_length, self.code_range)
+    
+    #reset game -- keep players, reset other game states
+    self.code_maker.generate_code()
     ### delete later -- for testing purposes only
     print(f'secret code generated it is {self.code_maker.secret_code.to_string()}')
     self.active_game = True
@@ -55,17 +57,44 @@ class Game:
     """Request Code Breaker to input a valid guess, returns a valid CodeEntry object that follows game restraints."""
     guess_code = self.code_breaker.make_guess()
     while not guess_code.is_valid():
-      #case switch here for inputs that arent code history, rules, quit, hint?
-      if guess_code.sequence.lower() == "h" or guess_code.sequence.lower() == "history":
-        print(self.get_history())
-      else:
-        print(f"Enter {self.code_length} numbers ranging from 0-{self.code_range - 1}.")
+      print(self.response_to_code_breaker_input(guess_code.sequence.lower()))
       guess_code = self.code_breaker.make_guess()
     return guess_code
   
-  # def analyze_code_breaker_input(self, user_input) -> str:
-  #   """Analyze the input and print a statement/handle game logic before returning it back?"""
-  #   pass
+  def response_to_code_breaker_input(self, user_input) -> str:
+    """Analyze and respond to input user input. Returns string back in response to handling input."""
+    commands = {
+      "rules": "Rules of the game.",
+      "help": "List of commands.",
+      "hint": "Reveals a number and its position in the secret code.",
+      "reset": "Resets the current game.",
+      "quit": "Quits the current game.",
+      "history": "Print current game guesses and feedbacks.",
+      "previous [number]": "Print history of of the n-th game, if played.",
+    }
+    match(user_input):
+      case "rules":
+        return f"Mastermind: The goal of this game is to match your guess to a secret code of {self.code_length} numbers ranging from 0-{self.code_range} in {self.max_attempt} attempts."
+      case "help":
+        statement = []
+        for command, brief in commands.items():
+          statement.append(f"{command} - {brief}")
+        return "\n".join(statement)
+      case "hint":
+        return "printing hint"
+      case "reset":
+        return "resetting game"
+      case "quit":
+        return "quitting game"
+      case "history":
+        return self.get_history()
+      case x if "previous" in x:
+        #WIP
+        #validations for prev_game number
+        _, prev_game = user_input.split()
+        return f"printing history of Game #{prev_game}"
+      case _:
+        return f"Enter {self.code_length} numbers ranging from 0-{self.code_range-1}, or input 'help' to see other commands."
 
   def request_code_maker_evalulation(self, guess_code) -> "Feedback":
     """Request Code Maker to make evaluation of CodeEntry comparison quality."""
@@ -74,8 +103,9 @@ class Game:
     return requested_feedback
 
   def update_game_state(self) -> None:
-    """Update history and turn counter."""
+    """Update history, turn counter, print remaining turn(s)."""
     self.history.append((self.current_guess, self.current_feedback))
+    print(f"{self.max_attempt - self.turn} guess{'es' if self.turn != self.max_attempt-1 else ''} remaining.")
     self.turn += 1
     self.code_breaker.turn = self.turn
 
