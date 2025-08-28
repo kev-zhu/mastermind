@@ -37,6 +37,13 @@ class CodeMaker:
       s += (str)(random.randint(0, self.code_range - 1))
     return s
 
+  def get_hint_position_dict(self) -> dict:
+    """Return a dictionary where key, value pairs are the secret's position and secrete value at that position."""
+    hint_num_ind_dict = {}
+    for n in range(len(self.secret_code.sequence)):
+      hint_num_ind_dict[n] = self.secret_code.sequence[n]
+    return hint_num_ind_dict
+
   def evaluate_code(self, guess_code: CodeEntry) -> Feedback:
     """
     Calls a comparison between CodeMaker's secrete code and CodeBreaker's guess code, return Feedback object.

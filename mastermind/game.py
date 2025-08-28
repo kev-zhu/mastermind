@@ -18,6 +18,8 @@ class Game:
     self.turn = 0
     self.history = [] # List[Tuple(CodeEntry, Feedback)]
     self.active_game = False
+    self.hint_answer_dict = {}
+    self.hint = ""
     self.current_guess = None
     self.current_feedback = None
     self.winner = None
@@ -29,6 +31,8 @@ class Game:
     
     #reset game -- keep players, reset other game states
     self.code_maker.generate_code()
+    self.hint_answer_dict = self.code_maker.get_hint_position_dict()
+    self.hint = "x" * self.code_length
     ### delete later -- for testing purposes only
     print(f'secret code generated it is {self.code_maker.secret_code.to_string()}')
     self.active_game = True
@@ -81,7 +85,8 @@ class Game:
           statement.append(f"{command} - {brief}")
         return "\n".join(statement)
       case "hint":
-        return "printing hint"
+        self.reveal_one_hint()
+        return self.hint
       case "reset":
         return "resetting game"
       case "quit":
@@ -95,6 +100,19 @@ class Game:
         return f"printing history of Game #{prev_game}"
       case _:
         return f"Enter {self.code_length} numbers ranging from 0-{self.code_range-1}, or input 'help' to see other commands."
+
+  def reveal_one_hint(self) -> None:
+    """Update current game's hint to reveal left most number in hidden sequence."""
+    hidden_hint_pos = list(self.hint_answer_dict.keys())
+    if len(hidden_hint_pos) > 0:
+      hint_position = hidden_hint_pos[0]
+      print(hint_position, type(hint_position), self.hint[hint_position], type(self.hint_answer_dict[hint_position]))
+      hint_array = list(self.hint)
+      hint_array[hint_position] = self.hint_answer_dict[hint_position]
+      self.hint = "".join(hint_array)
+      del self.hint_answer_dict[hint_position]
+    else:
+      print(f"There are no more hints to give. The answer is {self.hint}")
 
   def request_code_maker_evalulation(self, guess_code) -> "Feedback":
     """Request Code Maker to make evaluation of CodeEntry comparison quality."""
