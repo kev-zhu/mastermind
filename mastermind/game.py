@@ -28,7 +28,10 @@ class Game:
     """Initialize players, set up game, and prepare to run game loop."""
     self.code_maker = CodeMaker(self.code_length, self.code_range)
     self.code_breaker = CodeBreaker(self.code_length, self.code_range)
-    
+    self.reset_game_state()
+
+  def reset_game_state(self) -> None:
+    """Resets the state of the game to simulate it being a start of a new game."""
     #reset game -- keep players, reset other game states
     self.code_maker.generate_code()
     self.hint_answer_dict = self.code_maker.get_hint_position_dict()
@@ -37,6 +40,7 @@ class Game:
     print(f'secret code generated it is {self.code_maker.secret_code.to_string()}')
     self.active_game = True
     self.turn = 1
+    self.code_breaker.turn = self.turn
     self.history.clear()
     self.current_guess = None
     self.current_feedback = None
@@ -88,7 +92,8 @@ class Game:
         self.reveal_one_hint()
         return self.hint
       case "reset":
-        return "resetting game"
+        self.reset_game_state()
+        return "This game has been reset. A new secret code has been made and CodeBreaker is starting from turn #1."
       case "quit":
         return "quitting game"
       case "history":
@@ -106,13 +111,12 @@ class Game:
     hidden_hint_pos = list(self.hint_answer_dict.keys())
     if len(hidden_hint_pos) > 0:
       hint_position = hidden_hint_pos[0]
-      print(hint_position, type(hint_position), self.hint[hint_position], type(self.hint_answer_dict[hint_position]))
       hint_array = list(self.hint)
       hint_array[hint_position] = self.hint_answer_dict[hint_position]
       self.hint = "".join(hint_array)
       del self.hint_answer_dict[hint_position]
     else:
-      print(f"There are no more hints to give. The answer is {self.hint}")
+      print(f"There are no more hints to give. The answer is:")
 
   def request_code_maker_evalulation(self, guess_code) -> "Feedback":
     """Request Code Maker to make evaluation of CodeEntry comparison quality."""
