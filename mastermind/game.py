@@ -112,6 +112,7 @@ class Game:
   
   def response_to_code_breaker_input(self, user_input: str) -> str:
     """Analyze and respond to input user input. Returns string back in response to handling input."""
+    rules = f"Mastermind: The goal of this game is to match your guess to a secret code of {self.code_length} numbers ranging from 0-{self.code_range} in {self.max_attempt} attempts."
     commands = {
       "rules": "Rules of the game.",
       "help": "List of commands.",
@@ -123,7 +124,7 @@ class Game:
     }
     match(user_input):
       case "rules":
-        return f"Mastermind: The goal of this game is to match your guess to a secret code of {self.code_length} numbers ranging from 0-{self.code_range} in {self.max_attempt} attempts."
+        return rules
       case "help":
         statement = []
         for command, brief in commands.items():
@@ -142,20 +143,10 @@ class Game:
         formatted_curr_game_history = self.format_game_history(self.current_game_history)
         return formatted_curr_game_history
       case x if "previous" in x:
-        prev_request_format_issue = "Please follow the format when looking up previous match histories: 'previous [number]'."
-        user_input_arr = user_input.split()
-        #validate proper format
-        if len(user_input_arr) == 2:
-          prev_str, prev_game_num = user_input_arr
-          if prev_str == "previous" and prev_game_num.isdigit():
-            #check for valid prev game num
-            if 0 < int(prev_game_num) <= len(self.prev_match_history):
-              target_match_history = self.prev_match_history[int(prev_game_num)]
-              prev_game_winner, prev_game_history = target_match_history
-              return f"Winner: {prev_game_winner}\n{self.format_game_history(prev_game_history)}"
-            return f"You've only played {len(self.prev_match_history)} game(s) and can only look up the history for those."
-          return prev_request_format_issue
-        return prev_request_format_issue
+        game_number = self.validate_previous_input_entry(user_input)
+        if game_number:
+          return self.previous_game_look_up(game_number)
+        return "Please follow the format when looking up previous match histories: 'previous [number]' for games that have already been played."
       case _:
         return f"Enter {self.code_length} numbers ranging from 0-{self.code_range-1}, or input 'help' to see other commands."
 
@@ -170,6 +161,23 @@ class Game:
       del self.hint_answer_dict[selected_hint_pos]
     else:
       print(f"There are no more hints to give! The answer is:")
+
+  def validate_previous_input_entry(self, user_input) -> int:
+    """Validate user input for previous game lookup request, return int representing the nth game played."""
+    user_input_arr = user_input.split()
+    #validate proper format
+    if len(user_input_arr) == 2:
+      prev_str, prev_game_num = user_input_arr
+      if prev_str == "previous" and prev_game_num.isdigit():
+        #check for valid prev game num
+        if 0 < int(prev_game_num) <= len(self.prev_match_history):
+          return int(prev_game_num)
+
+  def previous_game_look_up(self, game_number) -> str:
+    """Look up saved previous game history and return formatted response."""
+    target_match_history = self.prev_match_history[game_number]
+    prev_game_winner, prev_game_history = target_match_history
+    return f"Winner: {prev_game_winner}\n{self.format_game_history(prev_game_history)}"
 
   def request_code_maker_evalulation(self, guess_code: "Code") -> "Feedback":
     """Request Code Maker to make evaluation of CodeEntry comparison quality."""
