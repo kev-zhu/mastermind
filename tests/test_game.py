@@ -117,8 +117,8 @@ def test_game_end_to_end_breaker_wins(monkeypatch):
   game.current_feedback = mock_feedback
   game.code_maker.evaluate_code.return_value = mock_feedback
   game.make_move()
-  #game.run() called here to do a check for the next game move following game move
-  game.run()
+  #game.run_one_game() called here to do a check for the next game move following game move
+  game.run_one_game()
   assert game.winner == "Code Breaker"
   assert not game.active_game
 
@@ -137,8 +137,8 @@ def test_game_end_to_end_maker_wins():
   mock_feedback.is_perfect.return_value = False
   game.code_maker.evalulate_code.return_value = mock_feedback
   game.make_move()
-  #game.run() called here to do a check for the next game move following game move
-  game.run()
+  #game.run_one_game() called here to do a check for the next game move following game move
+  game.run_one_game()
   assert game.winner == "Code Maker"
   assert not game.active_game
   assert game.turn == game.max_attempt + 1

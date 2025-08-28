@@ -23,6 +23,7 @@ class Game:
     self.current_guess = None
     self.current_feedback = None
     self.winner = None
+    self.game_count = 0
   
   def start(self) -> None:
     """Initialize players, set up game, and prepare to run game loop."""
@@ -47,11 +48,29 @@ class Game:
     self.winner = None
 
   def run(self) -> None:
-    """Runs the game loop after."""
+    """Runs entire game loop."""
+    play_again = None
+    #runs many iterations of the game
+    while self.active_game or play_again:
+      self.run_one_game()
+      play_again = self.ask_play_again()
+    print("Match history: . Goodbye!")
+ 
+  def run_one_game(self) -> None:
+    """Runs one iteration of the game until winner decided."""
+    self.game_count += 1
     while self.active_game and not self.is_over():
       self.make_move()
     self.active_game = False
     print(f"The secret code was {self.code_maker.secret_code.sequence}. Congratulations, {self.winner} won this round!")  
+
+  def ask_play_again(self) -> bool:
+    """Asks user if want to play again."""
+    play_again_input = input("Do you want to play again (y/n)? ")
+    if play_again_input and len(play_again_input) > 0 and play_again_input.lower()[0] == "y":
+      self.reset_game_state()
+      return True
+    return False
 
   def make_move(self) -> None:
     """Perform a single game move: CodeBreaker guess, CodeMaker evaluate, update game's current_guess and current_feedback."""
