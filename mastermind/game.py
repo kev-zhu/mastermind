@@ -65,7 +65,7 @@ class Game:
       if not self.quit_game:
         self.update_prev_match_history()
       play_again = self.ask_play_again()
-    print("Match history: . Goodbye!")
+    print(f"Match history: {self.format_match_history()}Goodbye!")
  
   def run_one_game(self) -> None:
     """Runs one iteration of the game until winner decided."""
@@ -202,3 +202,15 @@ class Game:
       guess_code, guess_feedback = history[guess_count]
       formatted.append(f"Guess #{guess_count + 1}: {guess_code.to_string()} - {guess_feedback.to_string()}")
     return ("\n").join(formatted)
+
+  def format_match_history(self) -> str:
+    matches = self.prev_match_history.keys()
+    if not matches:
+      return "No games played.\n"
+   
+    match_result_arr = [] 
+    for match in matches:
+      round_winner, _ = self.prev_match_history[match]
+      match_result_arr.append(f"Game {match} Winner: {round_winner}")
+    match_str = '\n'.join(match_result_arr)
+    return f"\n{match_str}\n"
