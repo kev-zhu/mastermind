@@ -65,7 +65,7 @@ def test_update_game_state_history_and_turns(dummy_code = "1234", dummy_length=4
   game.current_guess = CodeEntry(dummy_code, dummy_length, dummy_range)
   game.current_feedback = Feedback(dummy_length, dummy_length, dummy_length)
   game.update_game_state()
-  assert game.history == [(game.current_guess, game.current_feedback)]
+  assert game.current_game_history == [(game.current_guess, game.current_feedback)]
   assert game.turn == 2
   assert game.code_breaker.turn == 2
 
@@ -86,21 +86,21 @@ def test_game_is_over_perfect_guess_feedback():
   assert not game.active_game
   assert game.winner == "Code Breaker"
 
-def test_get_correct_history_format():
+def test_get_formatted_history_format():
   """History retrieval of previous game moves."""
   game = Game()
   game.code_breaker = CodeBreaker(4, 4)
   game.current_guess = CodeEntry("1234", 4, 8)
   game.current_feedback = Feedback(0, 0, 4)
   game.update_game_state()
-  history_str = game.get_history()
+  history_str = game.format_game_history(game.current_game_history)
   assert f"Guess #1: 1234 - {game.current_feedback.to_string()}" in history_str
   assert f"Guess #2:" not in history_str
 
   game.current_guess = CodeEntry("2345", 4, 8)
   game.current_feedback = Feedback(1, 1, 4)
   game.update_game_state()
-  history_str = game.get_history()
+  history_str = game.format_game_history(game.current_game_history)
   assert f"Guess #1: 1234 -" in history_str
   assert f"Guess #2: 2345 - {game.current_feedback.to_string()}" in history_str
 
