@@ -55,14 +55,15 @@ class Game:
     self.game_count -= 1
     self.active_game = False
     self.quit_game = True
-    
+
   def run(self) -> None:
     """Runs entire game loop."""
     play_again = None
     #runs many iterations of the game
     while self.active_game or play_again:
       self.run_one_game()
-      self.update_prev_match_history()
+      if not self.quit_game:
+        self.update_prev_match_history()
       play_again = self.ask_play_again()
     print("Match history: . Goodbye!")
  
