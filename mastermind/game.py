@@ -24,6 +24,7 @@ class Game:
     self.current_feedback = None
     self.winner = None
     self.game_count = 0
+    self.quit_game = None
     self.prev_match_history = {} #Dict{game_count (int): game_history (list)}
   
   def start(self) -> None:
@@ -47,7 +48,14 @@ class Game:
     self.current_guess = None
     self.current_feedback = None
     self.winner = None
+    self.quit_game = False
 
+  def quitting_game(self) -> None:
+    #uncount this game_count before quitting
+    self.game_count -= 1
+    self.active_game = False
+    self.quit_game = True
+    
   def run(self) -> None:
     """Runs entire game loop."""
     play_again = None
@@ -61,7 +69,9 @@ class Game:
   def run_one_game(self) -> None:
     """Runs one iteration of the game until winner decided."""
     self.game_count += 1
-    while self.active_game and not self.is_over():
+    while not self.is_over():
+      if self.quit_game:
+        return
       self.make_move()
     self.active_game = False
     print(f"The secret code was {self.code_maker.secret_code.sequence}. Congratulations, {self.winner} won this round!")  
@@ -80,6 +90,8 @@ class Game:
   def make_move(self) -> None:
     """Perform a single game move: CodeBreaker guess, CodeMaker evaluate, update game's current_guess and current_feedback."""
     guess_code = self.request_code_breaker_guess()
+    if self.quit_game:
+      return
     self.current_guess = guess_code
     guess_feedback = self.request_code_maker_evalulation(guess_code)
     self.current_feedback = guess_feedback
@@ -90,10 +102,12 @@ class Game:
     guess_code = self.code_breaker.make_guess()
     while not guess_code.is_valid():
       print(self.response_to_code_breaker_input(guess_code.sequence.lower()))
+      if self.quit_game:
+        return
       guess_code = self.code_breaker.make_guess()
     return guess_code
   
-  def response_to_code_breaker_input(self, user_input) -> str:
+  def response_to_code_breaker_input(self, user_input: str) -> str:
     """Analyze and respond to input user input. Returns string back in response to handling input."""
     commands = {
       "rules": "Rules of the game.",
@@ -119,7 +133,8 @@ class Game:
         self.reset_game_state()
         return "This game has been reset. A new secret code has been made and CodeBreaker is starting from turn #1."
       case "quit":
-        return "quitting game"
+        self.quitting_game()
+        return "You have left this game."
       case "history":
         formatted_curr_game_history = self.format_game_history(self.current_game_history)
         return formatted_curr_game_history
@@ -140,6 +155,7 @@ class Game:
         return prev_request_format_issue
       case _:
         return f"Enter {self.code_length} numbers ranging from 0-{self.code_range-1}, or input 'help' to see other commands."
+
 
   def reveal_one_hint(self) -> None:
     """Update current game's hint to reveal left most number in hidden sequence."""
@@ -170,9 +186,11 @@ class Game:
     """Check if game has ended and determine winner."""
     if self.turn > self.max_attempt:
       self.winner = "Code Maker"
+      self.active_game = False
       return True
     elif self.current_feedback and self.current_feedback.is_perfect():
       self.winner = "Code Breaker"
+      self.active_game = False
       return True
     return False
 
