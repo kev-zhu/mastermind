@@ -18,7 +18,7 @@ from mastermind import Feedback
 def test_game_boundaries(code_length, code_range, max_attempt, message):
   """Negative boundaries for game constructor initilization should trigger error or end."""
   with pytest.raises(ValueError, match=message):
-    game = Game(code_length, code_range, max_attempt)
+    Game(code_length, code_range, max_attempt)
 
 def test_game_start():
   """Should have updated version of game state after start() runs"""

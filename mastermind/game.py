@@ -28,19 +28,17 @@ class Game:
     self.prev_match_history = {} #Dict{game_count (int): game_history (list)}
   
   def start(self) -> None:
-    """Initialize players, set up game, and prepare to run game loop."""
+    """Initialize players and set up start of game."""
     self.code_maker = CodeMaker(self.code_length, self.code_range)
     self.code_breaker = CodeBreaker(self.code_length, self.code_range)
     self.reset_game_state()
 
   def reset_game_state(self) -> None:
-    """Resets the state of the game to simulate it being a start of a new game."""
+    """Resets the state of the game to simulate a start of a new game."""
     #reset game -- keep players, reset other game states
     self.code_maker.generate_code()
     self.hint_answer_dict = self.code_maker.get_hint_position_dict()
     self.hint = "x" * self.code_length
-    ### delete later -- for testing purposes only
-    print(f'secret code generated it is {self.code_maker.secret_code.to_string()}')
     self.active_game = True
     self.turn = 1
     self.code_breaker.turn = self.turn
@@ -50,15 +48,9 @@ class Game:
     self.winner = None
     self.quit_game = False
 
-  def quitting_game(self) -> None:
-    #uncount this game_count before quitting
-    self.game_count -= 1
-    self.active_game = False
-    self.quit_game = True
-
   def run(self) -> None:
     """Runs entire game loop."""
-    play_again = None
+    play_again = False
     #runs many iterations of the game
     while self.active_game or play_again:
       self.run_one_game()
@@ -77,7 +69,15 @@ class Game:
     self.active_game = False
     print(f"The secret code was {self.code_maker.secret_code.sequence}. Congratulations, {self.winner} won this round!")  
 
+  def quitting_game(self) -> None:
+    """Set game states for quitting game."""
+    #uncount this game_count before quitting
+    self.game_count -= 1
+    self.active_game = False
+    self.quit_game = True
+
   def update_prev_match_history(self) -> None:
+    """Update previous match history dictionary of current game's winner and game history."""
     self.prev_match_history[self.game_count] = (self.winner, self.current_game_history)
 
   def ask_play_again(self) -> bool:
@@ -89,7 +89,7 @@ class Game:
     return False
 
   def make_move(self) -> None:
-    """Perform a single game move: CodeBreaker guess, CodeMaker evaluate, update game's current_guess and current_feedback."""
+    """Perform a single game move: CodeBreaker guess, CodeMaker evaluate, update game's current_guess, current_feedback, and game state."""
     guess_code = self.request_code_breaker_guess()
     if self.quit_game:
       return
@@ -157,20 +157,19 @@ class Game:
       case _:
         return f"Enter {self.code_length} numbers ranging from 0-{self.code_range-1}, or input 'help' to see other commands."
 
-
   def reveal_one_hint(self) -> None:
-    """Update current game's hint to reveal left most number in hidden sequence."""
+    """Update current game's hint to reveal left most number of hidden sequence."""
     hidden_hint_pos = list(self.hint_answer_dict.keys())
     if len(hidden_hint_pos) > 0:
-      hint_position = hidden_hint_pos[0]
+      selected_hint_pos = hidden_hint_pos[0]
       hint_array = list(self.hint)
-      hint_array[hint_position] = self.hint_answer_dict[hint_position]
+      hint_array[selected_hint_pos] = self.hint_answer_dict[selected_hint_pos]
       self.hint = "".join(hint_array)
-      del self.hint_answer_dict[hint_position]
+      del self.hint_answer_dict[selected_hint_pos]
     else:
       print(f"There are no more hints to give! The answer is:")
 
-  def request_code_maker_evalulation(self, guess_code) -> "Feedback":
+  def request_code_maker_evalulation(self, guess_code: "Code") -> "Feedback":
     """Request Code Maker to make evaluation of CodeEntry comparison quality."""
     requested_feedback = self.code_maker.evaluate_code(guess_code)
     print(requested_feedback.to_string())
@@ -195,8 +194,8 @@ class Game:
       return True
     return False
 
-  def format_game_history(self, history) -> str:
-    """Print out formatted history of current guesses and feedback"""
+  def format_game_history(self, history: list) -> str:
+    """Return formatted history of current guesses and feedback"""
     formatted = []
     for guess_count in range(len(history)):
       guess_code, guess_feedback = history[guess_count]
@@ -204,6 +203,7 @@ class Game:
     return ("\n").join(formatted)
 
   def format_match_history(self) -> str:
+    """Return shortened result of all games played and its winner."""
     matches = self.prev_match_history.keys()
     if not matches:
       return "No games played.\n"
