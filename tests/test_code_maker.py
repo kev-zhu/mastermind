@@ -34,4 +34,4 @@ def test_evaluate_code():
   sample_code = CodeEntry("1234", 4, 8)
   feedback = code_maker.evaluate_code(sample_code)
   assert isinstance(feedback, Feedback)
-  assert feedback.is_perfect()
+  assert feedback.is_perfect_response()

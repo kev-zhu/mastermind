@@ -18,7 +18,7 @@ class CodeEntry:
     Returns:
       Feedback: Organized result of comparison.
     """
-    def count_num() -> int:
+    def count_matched_numbers() -> int:
       """Returns count of shared numbers between two code sequences."""
       count = 0
       this_dict = Counter(self.sequence)
@@ -29,7 +29,7 @@ class CodeEntry:
           count += min(this_dict[key], other_dict[key])
       return count
 
-    def count_loc() -> int:
+    def count_match_locations() -> int:
       """Returns count of indexes that shares the same value between two code sequences."""
       count = 0
       for i in range(len(self.sequence)):
@@ -37,8 +37,8 @@ class CodeEntry:
           count += 1
       return count
 
-    correct_num_count = count_num()
-    correct_loc_count = count_loc()
+    correct_num_count = count_matched_numbers()
+    correct_loc_count = count_match_locations()
 
     return Feedback(correct_num_count, correct_loc_count, self.length_rule)
 

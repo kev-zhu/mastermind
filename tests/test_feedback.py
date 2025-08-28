@@ -11,7 +11,7 @@ from mastermind import Feedback
 def test_feedback_is_perfect(correct_num, correct_loc, code_length, perfect):
   """Feedback should be perfect when correct_num = correct_loc = code_length."""
   feedback = Feedback(correct_num, correct_loc, code_length)
-  assert feedback.is_perfect() == perfect
+  assert feedback.is_perfect_response() == perfect
 
 @pytest.mark.parametrize("correct_num, correct_loc, code_length, feedback_string", [
   (4, 4, 4, "4 correct numbers and 4 correct locations"),   #4nums/4locs

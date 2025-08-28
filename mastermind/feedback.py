@@ -5,7 +5,7 @@ class Feedback:
     self.correct_location = correct_location
     self.code_length = code_length
 
-  def is_perfect(self) -> bool:
+  def is_perfect_response(self) -> bool:
     """Returns True if all parts of Feedback responses match code length."""
     return self.correct_location == self.code_length and self.correct_number == self.code_length
 

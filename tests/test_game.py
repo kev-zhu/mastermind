@@ -55,7 +55,7 @@ def test_request_code_maker_perfect_evaluation(sample_code_sequence, perfect, sa
   sample_guess_code = CodeEntry(sample_code_sequence, 4, 8)
   sample_feedback = game.request_code_maker_evalulation(sample_guess_code)
   assert isinstance(sample_feedback, Feedback)
-  assert sample_feedback.is_perfect() == perfect
+  assert sample_feedback.is_perfect_response() == perfect
   assert sample_feedback.to_string() == sample_feedback_string
 
 def test_update_game_state_history_and_turns(dummy_code = "1234", dummy_length=4, dummy_range=8):
