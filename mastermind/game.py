@@ -1,3 +1,4 @@
+import os
 from .code_maker import CodeMaker
 from .code_breaker import CodeBreaker
 
@@ -31,9 +32,14 @@ class Game:
   
   def start(self) -> None:
     """Initialize players and set up start of game."""
+    self.welcome_rules()
     self.code_maker = CodeMaker(self.code_length, self.code_range)
     self.code_breaker = CodeBreaker(self.code_length, self.code_range)
     self.reset_game_state()
+
+  def welcome_rules(self) -> None:
+    """Welcome player and sets out rules for better UX."""
+    print(f"Welcome to Mastermind. Try to figure out the secret code! It is {self.code_length} numbers long ranging from 0-{self.code_range}. You have {self.max_attempt}. You can input 'help' for more commands. Good luck!")
 
   def reset_game_state(self) -> None:
     """Resets the state of the game to simulate a start of a new game."""
@@ -59,16 +65,20 @@ class Game:
       if not self.quit_game:
         self.update_prev_match_history()
       play_again = self.ask_play_again()
+      os.system("clear")
     print(f"Match history: {self.format_match_history()}Goodbye!")
  
   def run_one_game(self) -> None:
     """Runs one iteration of the game until winner decided."""
     self.game_count += 1
+    print(f"Starting game #{self.game_count}.")
+
     while not self.is_over():
       if self.quit_game:
         return
       self.make_move()
     self.active_game = False
+    print()
     print(f"The secret code was {self.code_maker.secret_code.sequence}. Congratulations, {self.winner} won this round!")  
 
   def quitting_game(self) -> None:
@@ -92,6 +102,7 @@ class Game:
 
   def make_move(self) -> None:
     """Perform a single game move: CodeBreaker guess, CodeMaker evaluate, update game's current_guess, current_feedback, and game state."""
+    print()
     guess_code = self.request_code_breaker_guess()
     if self.quit_game:
       return
@@ -107,6 +118,7 @@ class Game:
       print(self.response_to_code_breaker_input(guess_code.sequence.lower()))
       if self.quit_game:
         return
+      print()
       guess_code = self.code_breaker.make_guess()
     return guess_code
   
@@ -117,10 +129,11 @@ class Game:
       "rules": "Rules of the game.",
       "help": "List of commands.",
       "hint": "Reveals a number and its position in the secret code.",
+      "clear": "Clear out terminal.",
       "reset": "Resets the current game.",
       "quit": "Quits the current game.",
       "history": "Print current game guesses and feedbacks.",
-      "previous [number]": "Print history of of the n-th game, if played.",
+      "previous [number]": "Print history of of the n-th game, if played."
     }
     match(user_input):
       case "rules":
@@ -133,11 +146,16 @@ class Game:
       case "hint":
         self.reveal_one_hint()
         return self.hint
+      case "clear":
+        os.system("clear")
+        return "Much cleaner! Input 'history' to see previous moves made."
       case "reset":
         self.reset_game_state()
-        return "This game has been reset. A new secret code has been made and CodeBreaker is starting from turn #1."
+        os.system("clear")
+        return f"Game #{self.game_count} has been reset. A new secret code has been made and CodeBreaker is now starting from turn #1."
       case "quit":
         self.quitting_game()
+        os.system("clear")
         return "You have left this game."
       case "history":
         formatted_curr_game_history = self.format_game_history(self.current_game_history)
