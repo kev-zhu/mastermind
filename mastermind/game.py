@@ -30,7 +30,8 @@ class Game:
     self.quit_game = None
     self.prev_match_history = {} #Dict{game_count (int): game_history (list)}
   
-  def clear_terminal(self):
+  def clear_terminal(self) -> None:
+    """For clearing out terminal (UI extension)."""
     if os.name == "nt":   #for Windows
       os.system("cls")
     else:     #for Linux and macOS
@@ -45,11 +46,11 @@ class Game:
 
   def welcome_rules(self) -> None:
     """Welcome player and sets out rules for better UX."""
-    print(f"Welcome to Mastermind. Try to figure out the secret code! It is {self.code_length} numbers long ranging from 0-{self.code_range}. You have {self.max_attempt}. You can input 'help' for more commands. Good luck!")
+    print(f"Welcome to Mastermind. Try to figure out the secret code! It is {self.code_length} numbers long ranging from 0-{self.code_range}. You have {self.max_attempt} attempts. You can input 'help' for more commands. Good luck!")
 
   def reset_game_state(self) -> None:
     """Resets the state of the game to simulate a start of a new game."""
-    #reset game -- keep players, reset other game states
+    #reset game states, do not affect players
     self.code_maker.generate_code()
     self.hint_answer_dict = self.code_maker.get_hint_position_dict()
     self.hint = "x" * self.code_length
