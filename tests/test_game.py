@@ -25,17 +25,74 @@ def test_game_start():
   game = Game()
   assert game.code_maker == None
   assert game.code_breaker == None
-  assert game.turn == 0
-  assert game.active_game == False
   game.start()
   assert isinstance(game.code_maker, CodeMaker)
   assert isinstance(game.code_breaker, CodeBreaker)
-  assert game.turn == 1
+
+def test_start_game_reset_call():
+  """Starting game should call on a reset/starting of the game states."""
+  game = Game()
+  game.start()
+  game.reset_game_state() #this is called at end of start, recall again for visual
+  assert isinstance(game.code_maker.secret_code, CodeEntry)
+  assert isinstance(game.hint_answer_dict, dict)
+  assert len(game.hint_answer_dict) == game.code_length
+  assert game.hint == "x" * game.code_length
   assert game.active_game
+  assert game.turn == 1
+  assert game.code_breaker.turn == game.turn
+  assert len(game.current_game_history) == 0
+  assert not game.current_guess
+  assert not game.current_feedback
+  assert not game.winner
+  assert not game.quit_game
+
+def test_quitting_game():
+  """Ensure un-counting the active game when player submits quitting request."""
+  game = Game()
+  game.start()
+  game.game_count = 1
+  assert game.game_count == 1
+  assert game.active_game
+  assert not game.quit_game
+  game.quitting_game()
+  assert game.game_count == 0
+  assert not game.active_game
+  assert game.quit_game
+
+def test_update_prev_match_history():
+  """Ensure that record of winner and current game history is uploaded to the prev_match_history dict."""
+  game = Game()
+  game.start()
+  game.game_count = 1
+  game.winner = "Either role"
+  game.current_game_history = ["Random history"]
+  game.update_prev_match_history()
+  winner, game_history = game.prev_match_history[1]
+  assert len(game.prev_match_history) == 1
+  assert isinstance(game.prev_match_history[1], tuple)
+  assert game.winner == winner
+  assert game.current_game_history == game_history
+
+@pytest.mark.parametrize("user_input, result", [
+  ("yes", True),
+  ("Yes", True),
+  ("YES", True),
+  ("no", False),
+  ("1234", False),
+  ("", False) 
+])
+def test_ask_play_again(monkeypatch, user_input, result):
+  """Takes in user input and returns True/False based on input, anything 'y' should yield True."""
+  monkeypatch.setattr("builtins.input", lambda _: user_input)
+  game = Game()
+  game.start()
+  response = game.ask_play_again()
+  assert response == result
 
 def test_code_breaker_guess_request(monkeypatch):
   """Automate input with monkeypatch to test for valid Code Breaker guess entry."""
-  monkeypatch.setattr("builtins.input", lambda _:"1234")
+  monkeypatch.setattr("builtins.input", lambda _: "1234")
   game = Game()
   game.code_breaker = CodeBreaker(4, 8)
   guess_code = game.request_code_breaker_guess()

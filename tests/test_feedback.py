@@ -8,7 +8,7 @@ from mastermind import Feedback
   (2, 1, 4, False),   #False - imperfect case
   (0, 0, 4, False)    #False - imperfect case
 ])
-def test_feedback_is_perfect(correct_num, correct_loc, code_length, perfect):
+def test_feedback_is_perfect_response(correct_num, correct_loc, code_length, perfect):
   """Feedback should be perfect when correct_num = correct_loc = code_length."""
   feedback = Feedback(correct_num, correct_loc, code_length)
   assert feedback.is_perfect_response() == perfect
