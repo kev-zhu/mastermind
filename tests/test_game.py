@@ -248,3 +248,31 @@ def test_game_end_to_end_maker_wins():
   assert game.winner == "Code Maker"
   assert not game.active_game
   assert game.turn == game.max_attempt + 1
+
+@pytest.mark.parametrize("user_input, abbreviated_response", [
+  ("rules", "Mastermind: The goal of this game"),
+  ("help", "help - List of commands."),
+  ("hint", "xxx"),
+  ("reset", "This game has been reset."),
+  ("quit", "You have left this game."),
+  ("history", "Guess #1"),
+  ("previous 1", "Winner: "),
+  ("default", "or input 'help' to see other commands.")
+])
+def test_response_to_different_code_breaker_commands_in_game(user_input, abbreviated_response):
+  """Compound for different code_breaker command response in game and compare its result to expected. Game is set up to simulate active game."""
+  game = Game()
+  game.start()
+  mock_prev_game_code = MagicMock()
+  mock_prev_gamefeedback = MagicMock()
+  game.prev_match_history[1] = ("random winner", [(mock_prev_game_code, mock_prev_gamefeedback)])
+  game.code_breaker = MagicMock()
+  game.code_maker = MagicMock()
+  mock_guess = MagicMock()
+  mock_guess.is_valid.return_value = True
+  game.code_breaker.make_guess_return_value = mock_guess
+  mock_feedback = MagicMock()
+  mock_feedback.is_perfect.return_value = False
+  game.code_maker.evalulate_code.return_value = mock_feedback
+  game.make_move()
+  assert abbreviated_response in game.response_to_code_breaker_input(user_input)
