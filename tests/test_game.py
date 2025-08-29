@@ -90,6 +90,24 @@ def test_ask_play_again(monkeypatch, user_input, result):
   response = game.ask_play_again()
   assert response == result
 
+@pytest.mark.parametrize("reveal_count", [
+  1,2,3,4
+])
+def test_reveal_one_hint(reveal_count):
+  """Expect hidden hint of XXXX to reveal one left most digit per call."""
+  game = Game()
+  game.start()
+  hidden_code_length = game.code_length
+  assert game.hint == "x" * game.code_length
+  assert len(game.hint_answer_dict) == game.code_length
+  for _ in range(reveal_count):
+    game.reveal_one_hint()
+  hidden_code_length -= reveal_count
+  assert game.hint[0:reveal_count].isdigit()
+  assert game.hint[0:reveal_count] == game.code_maker.secret_code.sequence[0:reveal_count]
+  assert game.hint[reveal_count:] == "x" * hidden_code_length
+  assert len(game.hint_answer_dict) == hidden_code_length
+
 def test_code_breaker_guess_request(monkeypatch):
   """Automate input with monkeypatch to test for valid Code Breaker guess entry."""
   monkeypatch.setattr("builtins.input", lambda _: "1234")
