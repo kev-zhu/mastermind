@@ -27,6 +27,18 @@ def test_in_house_random_seq_gen(code_length, code_range):
   assert all([0 <= int(c) < code_range for c in sequence])  #test for range
   assert len(sequence) == code_length                       #test for length
 
+def test_get_hint_pos_dict():
+  """Should have a formatted dict that both position and value of secret."""
+  code_maker = CodeMaker(4, 8)
+  code_maker.generate_code()
+  hint_dict = code_maker.get_hint_position_dict()
+  rebuilt_secret = ["x"] * 4
+  for key in hint_dict.keys():
+    rebuilt_secret[key] = hint_dict[key]
+  assert isinstance(hint_dict, dict)
+  assert len(hint_dict) == len(code_maker.secret_code.sequence)
+  assert code_maker.secret_code.sequence == "".join(rebuilt_secret)
+
 def test_evaluate_code():
   """Method calls on Code comparison: should return Feedback object"""
   code_maker = CodeMaker(4, 8)                        #ensure perfect feedback object is returned across calls
