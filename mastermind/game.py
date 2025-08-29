@@ -30,6 +30,12 @@ class Game:
     self.quit_game = None
     self.prev_match_history = {} #Dict{game_count (int): game_history (list)}
   
+  def clear_terminal(self):
+    if os.name == "nt":   #for Windows
+      os.system("cls")
+    else:     #for Linux and macOS
+      os.system("clear")
+
   def start(self) -> None:
     """Initialize players and set up start of game."""
     self.welcome_rules()
@@ -65,7 +71,7 @@ class Game:
       if not self.quit_game:
         self.update_prev_match_history()
       play_again = self.ask_play_again()
-      os.system("clear")
+      self.clear_terminal()
     print(f"Match history: {self.format_match_history()}Goodbye!")
  
   def run_one_game(self) -> None:
@@ -147,15 +153,15 @@ class Game:
         self.reveal_one_hint()
         return self.hint
       case "clear":
-        os.system("clear")
+        self.clear_terminal()
         return "Much cleaner! Input 'history' to see previous moves made."
       case "reset":
         self.reset_game_state()
-        os.system("clear")
+        self.clear_terminal()
         return f"Game #{self.game_count} has been reset. A new secret code has been made and CodeBreaker is now starting from turn #1."
       case "quit":
         self.quitting_game()
-        os.system("clear")
+        self.clear_terminal()
         return "You have left this game."
       case "history":
         formatted_curr_game_history = self.format_game_history(self.current_game_history)
