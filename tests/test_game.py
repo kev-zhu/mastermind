@@ -108,6 +108,37 @@ def test_reveal_one_hint(reveal_count):
   assert game.hint[reveal_count:] == "x" * hidden_code_length
   assert len(game.hint_answer_dict) == hidden_code_length
 
+@pytest.mark.parametrize("user_input, valid", [
+  ("previous 1", True),
+  ("previous 0", False),
+  ("previous 22", False),
+  ("previous a", False),
+  ("prev 1", False),
+  ("1 previous", False)
+])
+def test_validation_on_previous_game_lookup_input(monkeypatch, user_input, valid):
+  """Expect return of targeted game # if success, otherwise return None if inproper input."""
+  monkeypatch.setattr("builtins.input", lambda _: user_input)
+  game = Game()
+  # add 5 fake game histories previous game history log
+  for game_count in range(5):
+    game.prev_match_history[game_count] = {game_count: ("random winner", [])}
+  assert game.validate_previous_input_entry(user_input) == valid
+
+def test_previous_game_lookup():
+  """Expect a formatted string of a previous game match history."""
+  game = Game()
+  # add 2 fake game histories previous game history log
+  for game_count in range(2):
+    mock_code = MagicMock()
+    mock_feedback = MagicMock()
+    mock_code.to_string.return_value = ""
+    mock_feedback.to_string.return_value = ""
+    game.prev_match_history[game_count] = ("random winner", [(mock_code, mock_feedback)])
+  target_game_history = game.previous_game_look_up(1)
+  assert "random winner" in target_game_history
+  assert "Winner:" in target_game_history
+
 def test_code_breaker_guess_request(monkeypatch):
   """Automate input with monkeypatch to test for valid Code Breaker guess entry."""
   monkeypatch.setattr("builtins.input", lambda _: "1234")

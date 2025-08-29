@@ -163,7 +163,7 @@ class Game:
       print(f"There are no more hints to give! The answer is:")
 
   def validate_previous_input_entry(self, user_input) -> int:
-    """Validate user input for previous game lookup request, return int representing the nth game played."""
+    """Validate user input for previous game lookup request, return int representing the nth game played, 0 being DNE."""
     user_input_arr = user_input.split()
     #validate proper format
     if len(user_input_arr) == 2:
@@ -172,6 +172,7 @@ class Game:
         #check for valid prev game num
         if 0 < int(prev_game_num) <= len(self.prev_match_history):
           return int(prev_game_num)
+    return 0
 
   def previous_game_look_up(self, game_number) -> str:
     """Look up saved previous game history and return formatted response."""
